@@ -61,4 +61,31 @@ plt.legend()
 plt.title("AQI Daily and Mean Values")
 plt.show()
 
+#%% Task 2.2
+
+import scipy as sc
+from scipy.stats import norm
+
+nA = 500
+NA = 1000
+pA = nA/NA
+muA = pA
+sigmaA = sc.sqrt(pA*(1-pA)/NA)
+
+nB = 550
+NB = 1000
+pB = nB/NB
+muB = pB
+sigmaB = sc.sqrt(pB*(1-pB)/NB)
+
+phat = NA*pA/(NA+NB) + NB*pB/(NA+NB)
+qhat = 1-phat
+
+z = (pA - pB)/sc.sqrt(phat*qhat*(1/NA + 1/NB)) 
+print(z)
+
+#%% Task 2.3
+p_value = 1-norm.cdf(z)
+print(p_value)
+
 #%%
