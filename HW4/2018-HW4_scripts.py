@@ -8,6 +8,7 @@ Created on Tue Feb  6 13:16:27 2018
 # HW4 scripts
 
 import pandas as pd
+import numpy as np
 import scipy as sc
 from scipy.stats import norm
 
@@ -48,6 +49,16 @@ plt.plot(POC4[["DAILY_AQI_VALUE"]], label="POC 4")
 plt.plot(POC5[["DAILY_AQI_VALUE"]], label="POC 5")
 plt.legend()
 plt.title("Daily AQI Value by POC")
+plt.show()
+
+#%% Task 1.4
+fig4 = plt.figure()
+aqi = aqd_date.mean()[["DAILY_AQI_VALUE"]]
+mvg_avg = np.round(aqi["DAILY_AQI_VALUE"].rolling(window = 20, center = False).mean(), 2)
+plt.plot(aqi, label="AQI Daily Values")
+plt.plot(mvg_avg, label="AQI Moving Average")
+plt.legend()
+plt.title("AQI Daily and Mean Values")
 plt.show()
 
 #%%
