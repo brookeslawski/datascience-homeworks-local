@@ -65,7 +65,7 @@ plt.legend(["POC 1", "POC 4", "POC 5"])
 
 #%% Task 1.4
 fig4 = plt.figure()
-aqi = aqd_date.mean()[["DAILY_AQI_VALUE"]]
+aqi = aqd.groupby("Date")[["DAILY_AQI_VALUE"]].mean()
 mvg_avg = np.round(aqi["DAILY_AQI_VALUE"].rolling(window = 20, center = False).mean(), 2)
 plt.plot(aqi, label="AQI Daily Values")
 plt.plot(mvg_avg, label="AQI Moving Average")
