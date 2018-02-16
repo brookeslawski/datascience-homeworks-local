@@ -31,8 +31,7 @@ print('data shape: ' + str(data.shape))
 
 #%% Task 2
 
-truncdata = data[data["LstPrice"] >= 200000]
-truncdata = truncdata[truncdata["LstPrice"] <= 1000000]
+truncdata = data[(data["LstPrice"] >= 200000) & (data["LstPrice"] <= 1000000)]
 print(truncdata.shape)
 housedata=truncdata.drop(['AdditInfo','Area','BackDim','City','ListCoAgt','CompBac','CompDays','CompSac','ContPh1','ContPh2','Contact','County','EntrdBy','HouseNbr','NumDish','NumRefg','OpenHseDt','PublicID','RMPriceLow','ReinstDt','Remarks','SchDist','SlAgentPub','StatCode','State','StrType','SubAgncy','TimeClause','TotWinEvp','UndrCnst','UnitNbr','Water','WinEle1','WinEle2','WinEle3','WinEle4','WinEvp1','WinEvp2','WinEvp3','WinEvp4','WithDrDt'], axis=1)
 
@@ -154,7 +153,7 @@ plt.show()
 
 # %%
 # Task 4
-hdf.plot.scatter(x="Longitude", y="Latitude")
+hdf.plot.scatter(x="Longitude", y="Latitude", c="SoldPrice")
 
 # %% Task 5
 
@@ -191,7 +190,6 @@ sp_all_ols = sm.ols(formula="SoldPrice ~ Acres + GaragCap + Latitude + Longitude
 #Latitude has high p-value so getting rid of it
 
 sp_all_ols = sm.ols(formula="SoldPrice ~ Acres + GaragCap + Longitude + TotBth + TotSqf", data=hdf).fit()
-# but then R-squred val went down
 
 sp_all_ols.summary()
 
@@ -199,7 +197,7 @@ sp_all_ols.summary()
 
 sp_ptn = sm.ols(formula="SoldPrice ~ Prop_Type_num", data=hdf).fit()
 sp_ptn.summary()
-# r-squared is really low?  how is this good at predicting?
+# r-squared is really low?  how is this good at predicting? low p-val
 
 # %%
 
@@ -209,26 +207,19 @@ sp_ptn_tsf.summary()
 # r-squared is better, but p-val is terrible
 # %% TotSqf vs. SoldPrice
 
-#hdf.plot.scatter(x="TotSqf", y="SoldPrice")
-#plt.scatter(x=hdf["TotSqf"], y=hdf["SoldPrice"])
-#prop_type = hdf["PropType"]
-
 prop_type = hdf["Prop_Type_num"].tolist()
-Prop_color = [[1,0,0] if x == 0 else [0,0,1] for x in prop_type]
-hdf.plot.scatter(x="TotSqf", y="SoldPrice", s=50, c=Prop_color)
-#plt.scatter(x=hdf[hdf["PropType"]=="Condo"],y=hdf["SoldPrice"],  color='blue',label='Condo')
+prop_color = [[1,0,0] if x == 0 else [0,0,1] for x in prop_type]
+# red = [1,0,0] = townhouse or condo
+# blue = single family
+hdf.plot.scatter(x="TotSqf", y="SoldPrice", s=50, c=prop_color)
 
-plt.legend()
+plt.legend(prop_color)
 plt.xlabel('Total Square Ft')
 plt.ylabel('Sold Price ($)')
 plt.show()
-#plt.scatter(X_test[:,0], SoldPrice,  color='black',label='Condo')
-#plt.scatter(X_test[:,0], SoldPrice,  color='black',label='Condo')
 
 #%%
 
 # questions:
 
 # how to view all columns that have 3 or fewer unique values
-# how to view all column names (keeps truncating with ... b/c too many)
-# is there a difference between ' and "
