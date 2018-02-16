@@ -209,10 +209,14 @@ sp_ptn_tsf.summary()
 # r-squared is better, but p-val is terrible
 # %% TotSqf vs. SoldPrice
 
-# hdf.plot.scatter(x="TotSqf", y="SoldPrice")
-plt.scatter(x=hdf["TotSqf"], y=hdf["SoldPrice"])
-plt.scatter(x=hdf[hdf["PropType"]=="Single Family"],y=hdf["SoldPrice"],  color='red',label='Single Family')
-plt.scatter(x=hdf[hdf["PropType"]=="Condo"],y=hdf["SoldPrice"],  color='blue',label='Condo')
+#hdf.plot.scatter(x="TotSqf", y="SoldPrice")
+#plt.scatter(x=hdf["TotSqf"], y=hdf["SoldPrice"])
+#prop_type = hdf["PropType"]
+
+prop_type = hdf["Prop_Type_num"].tolist()
+Prop_color = [[1,0,0] if x == 0 else [0,0,1] for x in prop_type]
+hdf.plot.scatter(x="TotSqf", y="SoldPrice", s=50, c=Prop_color)
+#plt.scatter(x=hdf[hdf["PropType"]=="Condo"],y=hdf["SoldPrice"],  color='blue',label='Condo')
 
 plt.legend()
 plt.xlabel('Total Square Ft')
