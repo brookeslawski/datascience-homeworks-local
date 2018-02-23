@@ -33,10 +33,9 @@ plt.rcParams['figure.figsize'] = (10, 6)
 ## Your code goes here
 
 # download the fist ten pages
-for i in np.arange(1,11):
+# for i in np.arange(1,11):
     
 url = "https://github.com/search?o=desc&p=1&q=stars%3A%3E1&s=stars&type=Repositories"
-
 
 with urllib.request.urlopen(url) as response:
     html = response.read()
@@ -49,7 +48,8 @@ with urllib.request.urlopen(url) as response:
 # # save the file
 with open('git_repositories.html', 'w') as new_file:
     new_file.write(str(html.replace('\n','').encode('utf-8')))
-
+    
+# Creating the soup
 git_soup = BeautifulSoup(html, 'html.parser')
 
 # %% Task 1.3
@@ -96,3 +96,20 @@ print('# of stars:',stars_list,'\n')
 print('# of issues:',issues_list,'\n')
 print('# of forks:',forks_list,'\n')
 print('RM lengths:',rmlength_list,'\n')
+
+# %%
+
+# Convert list into DataFrame
+reposDF = pd.DataFrame({"Repository Names":name_list,
+                       "URLs":url_list,
+                       "Contributors":cont_list,
+                       "Language":lang_list,
+                       "Stars":stars_list,
+                       "Issues":issues_list,
+                       "Forks":forks_list,
+                       "ReadMe Length":rmlength_list})
+
+reposDF
+
+# Save dataframe to file project_info.csv
+reposDF.to_csv('project_info.csv', encoding='utf-8')
