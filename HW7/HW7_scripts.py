@@ -161,3 +161,78 @@ plt.show()
 # when k = 6, Accuracy =  0.922114047288
 
 #%% Part 2
+# Task 2.1
+newsdf = pd.read_csv('OnlineNewsPopularity/OnlineNewsPopularity.csv')
+newsdf.columns = newsdf.columns.str.replace(" ","") # get rid of extra spaces in attribute names (headers)
+newsdf.head()
+
+# Task 2.2
+print('News dataframe shape: ',newsdf.shape,'\n')
+print('Data types: \n',newsdf.dtypes)
+newsdf.tail()
+newsdf.describe()
+
+# looks like the maximum values of n_unique_tokens, n_non_stop_words, and n_non_stop_unique_tokens are not reasonable
+newsdf.loc[newsdf['n_unique_tokens'] == 701.0] # which article is this? #index 31037 ukraine civilians...
+# this entry also includes the maximum values of n_non_stop_words and n_non_stop_unique_tokens
+newsdf = newsdf[newsdf['n_unique_tokens'] != 701.0] #remove this entry
+newsdf.describe() # better
+
+print('Cleaned news dataframe shape: ',newsdf.shape,'\n')
+
+newsdf['shares'].describe()
+
+#From Task 2.1 part 3
+# export predictor vars as np array
+X = newsdf.drop(['url','timedelta','shares'],axis=1).as_matrix()
+shares = newsdf['shares'].as_matrix()
+y = [1 if x > 1400 else 0 for x in shares] #binary numpy array, y, which indicates whether or not each article is popular
+
+#%% Task 2.3
+
+k = 10
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.5)
+knn_model = KNeighborsClassifier(n_neighbors=k)
+knn_model.fit(X_train, y_train)
+
+y_pred = knn_model.predict(X_test)
+print('Confusion Matrix')
+print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
+print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
+
+# When k = 10, Accuracy =  0.558066794471
+
+#%%
+
+knn_model.get_params()
+
+Ks = np.linspace(1,100,100)
+Accuracies = np.zeros(Ks.shape[0])
+for i,k in enumerate(Ks): # what is enumerate?
+    knn_model = KNeighborsClassifier(n_neighbors=int(k))
+    scores = cross_val_score(estimator = knn_model, X = X, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
+    Accuracies[i]  = scores.mean()
+    
+plt.plot(Ks,Accuracies)
+plt.title('Evaluating accuracy of k-values')
+plt.xlabel('k value')
+plt.ylabel('Accuracy')
+plt.show()
+    
+#%%
+    
+plt.plot(Ks,Accuracies)
+plt.title('Evaluating accuracy of k-values')
+plt.xlabel('k value')
+plt.ylabel('Accuracy')
+plt.xlim(0,10)
+plt.show()
+
+# choose k = 6
+# when k = 6, Accuracy =  0.922114047288
+
+#%%
+
+
+
