@@ -68,7 +68,7 @@ for ii in y_test:
     #  ??????????????????????
     
 #%% Task 1.1.5 
-svm_model.get_params()
+model.get_params()
 
 Cs = np.linspace(1,500,100)
 Accuracies = np.zeros(Cs.shape[0])
@@ -192,7 +192,7 @@ y = [1 if x > 1400 else 0 for x in shares] #binary numpy array, y, which indicat
 
 k = 10
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.5)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.8)
 knn_model = KNeighborsClassifier(n_neighbors=k)
 knn_model.fit(X_train, y_train)
 
@@ -201,7 +201,7 @@ print('Confusion Matrix')
 print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
 print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
-# When k = 10, Accuracy =  0.558066794471
+# When k = 10, Accuracy =  0.552419990541
 
 #%%
 
@@ -226,13 +226,46 @@ plt.plot(Ks,Accuracies)
 plt.title('Evaluating accuracy of k-values')
 plt.xlabel('k value')
 plt.ylabel('Accuracy')
+plt.xlim(30,40)
+plt.show()
+
+# choose k = 37
+# when k = 37, Accuracy =  0.564401702664 - still not that great
+
+#%% Task 2.4
+
+Xsubset = X[:50][:]
+ysubset = y[:50]
+
+X_train, X_test, y_train, y_test = train_test_split(Xsubset, ysubset, random_state=1, test_size=0.8)
+
+svm_model = svm.SVC(kernel='rbf',C=100)
+svm_model.fit(X_train, y_train)
+
+y_pred = svm_model.predict(X_test)
+print('Confusion Matrix')
+print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
+print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
+
+# when C = 100, Accuracy =  0.56175
+
+#%%
+svm_model.get_params()
+
+Cs = np.linspace(1,500,100)
+Accuracies = np.zeros(Cs.shape[0])
+for i,C in enumerate(Cs): # what is enumerate?
+    svm_model = svm.SVC(kernel='rbf', C = C)
+    scores = cross_val_score(estimator = svm_model, X = X, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
+    Accuracies[i]  = scores.mean()
+    
+#%%
+
+plt.plot(Cs,Accuracies)
+plt.title('Evaluating accuracy of C')
+plt.xlabel('C value')
+plt.ylabel('Accuracy')
 plt.xlim(0,10)
 plt.show()
 
-# choose k = 6
-# when k = 6, Accuracy =  0.922114047288
-
 #%%
-
-
-
