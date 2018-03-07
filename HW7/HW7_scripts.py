@@ -292,15 +292,13 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 #%%
 news_svm.get_params()
-X = Xsubset
-y = ysubset
 
 Cs = np.linspace(1,500,100)
 Accuracies = np.zeros(Cs.shape[0])
 for i,C in enumerate(Cs): # what is enumerate?
-    print(i,C)
+    #print(i,C)
     news_svm = svm.SVC(kernel='rbf', C = C)
-    scores = cross_val_score(estimator = news_svm, X = X, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
+    scores = cross_val_score(estimator = news_svm, X = Xsubset, y = ysubset, cv=5, scoring='accuracy')     # cv = 5 ??
     Accuracies[i]  = scores.mean()
     
 #%%
@@ -312,9 +310,12 @@ plt.ylabel('Accuracy')
 #plt.xlim(0,10)
 plt.show()
 
+# getting a constant accuracy of 0.56 when model above gives accuracy of 0.6
+# why is this?
+
 #%% Task 2.5 Decision Trees ##################################
 
-labels =["Popular", "Unpopular"]
+#labels =["Popular", "Unpopular"]
 
 def splitData(features):
     news_predictors = X # titanic[features].as_matrix()
@@ -326,14 +327,53 @@ def splitData(features):
 
 #%%
 
-all_features = ["Pclass", "Sex", "Age", "SibSp", "Parch", "Fare", "Embarked"]
-
+all_features = list(newsdf)[2:60]
 XTrain, XTest, yTrain, yTest = splitData(all_features)
-decisionTree = tree.DecisionTreeClassifier()
-decisionTree = decisionTree.fit(XTrain, yTrain)
 
-y_pred_train = decisionTree.predict(XTrain)
-print('Accuracy on training data= ', metrics.accuracy_score(y_true = yTrain, y_pred = y_pred_train))
+#all_features = list(newsdf)[2:60]
+#
+#XTrain, XTest, yTrain, yTest = splitData(all_features)
+#decisionTree = tree.DecisionTreeClassifier(min_samples_split=15,max_depth=10)
+#decisionTree = tree.DecisionTreeClassifier()
+#decisionTree = decisionTree.fit(XTrain, yTrain)
+#
+#y_pred_train = decisionTree.predict(XTrain)
+#print('Accuracy on training data= ', metrics.accuracy_score(y_true = yTrain, y_pred = y_pred_train))
+#
+#y_pred = decisionTree.predict(XTest)
+#print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
+min_ss = np.linspace(1,5,5)
+max_depths = np.linspace(1,5,5)
+Accuracies = np.zeros(min_ss.shape[0])
+for i,ss in enumerate(min_ss): # i don't think i can use enumerate here ?????????????
+    for depth in max_depths:
+        print(i,ss,depth)
+        decisionTree = tree.DecisionTreeClassifier(min_samples_split=ss,max_depth=depth)
+        decisionTree = tree.DecisionTreeClassifier()
+        decisionTree = decisionTree.fit(XTrain, yTrain)
+        y_pred_train = decisionTree.predict(XTrain)
+        y_pred = decisionTree.predict(XTest)
+        Accuracies[i]  = metrics.accuracy_score(y_true = yTest, y_pred = y_pred)
 
-y_pred = decisionTree.predict(XTest)
-print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
+plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
+#plt.plot(min_ss,Accuracies)
+plt.title('Evaluating accuracy of DT models')
+plt.xlabel('Min_samples_split value')
+plt.ylabel('Accuracy')
+#plt.xlim(0,10)
+plt.show()
+
+#Accuracy on training data=  1.0  # this seems wrong
+#Accuracy on test data=  0.566766514268
+
+# when max_depth = 3:
+#Accuracy on training data=  1.0
+#Accuracy on test data=  0.568469178622
+
+# when max_depth = 10
+#Accuracy on training data=  1.0
+#Accuracy on test data=  0.569761942299
+
+#min_samples_split=15,max_depth=10
+#Accuracy on training data=  1.0
+#Accuracy on test data=  0.569730411477
