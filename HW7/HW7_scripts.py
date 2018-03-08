@@ -96,10 +96,10 @@ plt.show()
 
 #%% Task 1.1.6
 
-X = digits.data
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.8)
+Xraw = digits.data
+X_train, X_test, y_train, y_test = train_test_split(Xraw, y, random_state=1, test_size=0.8)
 
-rawdig_svm = svm.SVC(kernel='rbf',C=100)
+rawdig_svm = svm.SVC(kernel='rbf',C=10)
 rawdig_svm.fit(X_train, y_train)
 
 y_pred = rawdig_svm.predict(X_test)
@@ -118,6 +118,26 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 # is this wrong?  training the model on so much data that there is barelly enough to test it with
 
+#%%
+
+rawdig_svm.get_params()
+
+Cs = np.linspace(1,500,100)
+Accuracies = np.zeros(Cs.shape[0])
+for i,C in enumerate(Cs): # what is enumerate?
+    rawdig_svm = svm.SVC(kernel='rbf', C = C)
+    scores = cross_val_score(estimator = rawdig_svm, X = Xraw, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
+    Accuracies[i]  = scores.mean()
+
+#%%
+    
+plt.plot(Cs,Accuracies)
+plt.title('Evaluating accuracy of C')
+plt.xlabel('C value')
+plt.ylabel('Accuracy')
+plt.xlim(0,10) # change this to 0, 10
+plt.show()
+
 # %% Your interpretation
 
 #Using the test dataset, the model's accuracy is 95.4%, meaning that 95.4% points were classified correctly. As seen in the confusion matrix, the most common mistake made by the model is found in the cell containing the value '12,' meaning that the model incorrectly classified 12 digits as '7' when they were actually a '4.' ????
@@ -126,7 +146,7 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 #
 #When using a test_size of 0.8, I got an accuracy of 0.1182, which is terrible. Almost all data was classified as '0'. I then decreased the test_size from 0.8 to 0.5 to 0.1 to get an accuracy of 0.561, but this may be a questionable strategy since there is barely any data to test the algorithm on (10%).
 
-
+#Evaluating several different values of C, the plot shows that any C greater than or equal to 6 should yield an accuracy of ~0.475.  This is significantly lower than the accuracy of the model on scaled data.
 
 
 #%% Task 1.2.1
@@ -259,7 +279,7 @@ news_knn.get_params()
 
 Ks = np.linspace(1,100,100)
 Accuracies = np.zeros(Ks.shape[0])
-for i,k in enumerate(Ks): # what is enumerate?
+for i,k in enumerate(Ks):
     news_knn = KNeighborsClassifier(n_neighbors=int(k))
     scores = cross_val_score(estimator = news_knn, X = X, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
     Accuracies[i]  = scores.mean()
@@ -288,8 +308,8 @@ plt.show()
 
 #%% Task 2.4 SVM ################################################
 
-Xsubset = X[:50][:]
-ysubset = y[:50]
+Xsubset = X[:500][:]
+ysubset = y[:500]
 
 X_train, X_test, y_train, y_test = train_test_split(Xsubset, ysubset, random_state=1, test_size=0.8)
 
@@ -309,7 +329,7 @@ news_svm.get_params()
 Cs = np.linspace(1,500,100)
 Accuracies = np.zeros(Cs.shape[0])
 for i,C in enumerate(Cs): # what is enumerate?
-    #print(i,C)
+    print(i,C)
     news_svm = svm.SVC(kernel='rbf', C = C)
     scores = cross_val_score(estimator = news_svm, X = Xsubset, y = ysubset, cv=5, scoring='accuracy')     # cv = 5 ??
     Accuracies[i]  = scores.mean()
@@ -324,6 +344,8 @@ plt.ylabel('Accuracy')
 plt.show()
 
 # getting a constant accuracy of 0.56 when model above gives accuracy of 0.6
+# when i increased the subset, C = 1 was the maximum accuracy, then dropped significantly to a constat value
+
 # why is this?
 
 #%% Task 2.5 Decision Trees ##################################
@@ -343,9 +365,9 @@ def splitData(features):
 all_features = list(newsdf)[2:60]
 XTrain, XTest, yTrain, yTest = splitData(all_features)
 
-min_ss = np.arange(3,200,2)
+min_ss = np.arange(3,50,2)
 #min_ss = [3, 4, 5, 6, 10]
-max_depths = np.arange(3,100,2)
+max_depths = np.arange(3,50,2)
 #max_depths = [3, 5, 10, 15, 20, 25, 30, 40, 50, 60]
 #Accuracies = np.zeros(min_ss.shape[0])
 #Accuracies = np.zeros(len(min_ss))
@@ -371,13 +393,13 @@ print('max accuracy = '+str(max(accuracies)))
 #plt.show()
 
 
-#plt.scatter(min_ss, max_depths, s=Accuracies) #c=Accuracies) # is this the best way to show this???
-###plt.plot(min_ss,Accuracies)
-#plt.title('Evaluating accuracy of DT models')
-##plt.xlabel('Min_samples_split value')
-##plt.ylabel('Accuracy')
-###plt.xlim(0,10)
-#plt.show()
+plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
+##plt.plot(min_ss,Accuracies)
+plt.title('Evaluating accuracy of DT models')
+#plt.xlabel('Min_samples_split value')
+#plt.ylabel('Accuracy')
+##plt.xlim(0,10)
+plt.show()
 
 #Accuracy on training data=  1.0  # this seems wrong
 #Accuracy on test data=  0.566766514268
