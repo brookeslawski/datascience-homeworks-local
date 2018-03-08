@@ -343,22 +343,9 @@ def splitData(features):
 all_features = list(newsdf)[2:60]
 XTrain, XTest, yTrain, yTest = splitData(all_features)
 
-#all_features = list(newsdf)[2:60]
-#
-#XTrain, XTest, yTrain, yTest = splitData(all_features)
-#decisionTree = tree.DecisionTreeClassifier(min_samples_split=15,max_depth=10)
-#decisionTree = tree.DecisionTreeClassifier()
-#decisionTree = decisionTree.fit(XTrain, yTrain)
-#
-#y_pred_train = decisionTree.predict(XTrain)
-#print('Accuracy on training data= ', metrics.accuracy_score(y_true = yTrain, y_pred = y_pred_train))
-#
-#y_pred = decisionTree.predict(XTest)
-#print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
-
-min_ss = np.arange(3,100)
+min_ss = np.arange(3,200,2)
 #min_ss = [3, 4, 5, 6, 10]
-max_depths = np.arange(3,100)
+max_depths = np.arange(3,100,2)
 #max_depths = [3, 5, 10, 15, 20, 25, 30, 40, 50, 60]
 #Accuracies = np.zeros(min_ss.shape[0])
 #Accuracies = np.zeros(len(min_ss))
@@ -375,21 +362,21 @@ for ss in min_ss:
         
 print('max accuracy = '+str(max(accuracies)))
 
-plt.plot(min_ss,accuracies)
-plt.title('Min Sample Splits')
-plt.show()
+#plt.plot(min_ss,accuracies)
+#plt.title('Min Sample Splits')
+#plt.show()
+#
+#plt.plot(max_depths,accuracies)
+#plt.title('Max Depths')
+#plt.show()
 
-plt.plot(max_depths,accuracies)
-plt.title('Max Depths')
-plt.show()
 
-
-#plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
-##plt.plot(min_ss,Accuracies)
+#plt.scatter(min_ss, max_depths, s=Accuracies) #c=Accuracies) # is this the best way to show this???
+###plt.plot(min_ss,Accuracies)
 #plt.title('Evaluating accuracy of DT models')
-#plt.xlabel('Min_samples_split value')
-#plt.ylabel('Accuracy')
-##plt.xlim(0,10)
+##plt.xlabel('Min_samples_split value')
+##plt.ylabel('Accuracy')
+###plt.xlim(0,10)
 #plt.show()
 
 #Accuracy on training data=  1.0  # this seems wrong
