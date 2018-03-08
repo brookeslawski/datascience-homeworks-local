@@ -140,13 +140,13 @@ plt.show()
 
 # %% Your interpretation
 
-#Using the test dataset, the model's accuracy is 95.4%, meaning that 95.4% points were classified correctly. As seen in the confusion matrix, the most common mistake made by the model is found in the cell containing the value '12,' meaning that the model incorrectly classified 12 digits as '7' when they were actually a '4.' ????
+#Using the test dataset and with a test_size of 0.3, the model's accuracy is ~98%, meaning that 98% of the images were classified correctly.  As seen in the confusion matrix, the most common mistake made by the model is incorrectly classifying 2 digits as '2' when they were actually a '3', which it did in two cases.
 #
-#In Task 1.1.5, we evaluate accuracies of the SVM model and found that any C greater than or equal to 6 results in a constant maximum accuracy of 95.4%.
+#In Task 1.1.5, we evaluate accuracies of the SVM model and found that any C greater than or equal to 6 results in a constant maximum accuracy of 95.4% using cross validation.
 #
-#When using a test_size of 0.8, I got an accuracy of 0.1182, which is terrible. Almost all data was classified as '0'. I then decreased the test_size from 0.8 to 0.5 to 0.1 to get an accuracy of 0.561, but this may be a questionable strategy since there is barely any data to test the algorithm on (10%).
-
-#Evaluating several different values of C, the plot shows that any C greater than or equal to 6 should yield an accuracy of ~0.475.  This is significantly lower than the accuracy of the model on scaled data.
+#In Task 1.1.6, using the raw, unscaled data yielded an accuracy of 0.5, which is significantly lower than the model using the scaled data.  The model misclassified 23 images as showing '5' when they were actually '1'.  Interestingly, this model had the most trouble with handwritten images of 5s.
+#
+#Evaluating several different values of C for the model on raw data, the plot shows that any C greater than or equal to 6 should yield an accuracy of ~0.475.  This is significantly lower than the accuracy of the model on scaled data.
 
 
 
@@ -272,7 +272,12 @@ plt.xlim(0,10) # change this to 0, 10
 plt.show()
 
 
-
+# YOUR INTERPETATION
+#Using k-NN with a test_size of 0.3, we see an accuracy of 0.97, which is almost as good as the SVM accuracy of 0.98 in Task 1.1.  The most common mistake, which is seen in the Confusion Matrix, is that the model mis-classified 2 data points as Class 1 when they were actually class 8 and 2 more data points as class 5 when they were actually class 9.
+#
+#In Task 1.2.5, the variations of k show that there are two k-values that would yield high accuracy values of ~0.945 including k = 3 and k = 6, using cross-validation.  At k-values greater than 10, accuracy decreases steadily. Using k = 6, our accuracy of the k-NN model increased marginally from 0.966667 to 0.974.
+#
+#In Task 1.6.6, we use the raw data.  Using k = 6, we get an accuracy of 0.988889, which is incredible.  Evidently, the k-NN model does very well on unscaled data.
 
 
 
