@@ -49,7 +49,7 @@ plt.show()
 #%% Task 1.1
 
 # your solution goes here
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.8)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3) # test_size=0.8 doesn't make sense
 
 dig_svm = svm.SVC(kernel='rbf',C=100)  # change this one 6, 5, 4, 3, 2
 dig_svm.fit(X_train, y_train)
@@ -60,11 +60,11 @@ print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
 print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 #%% Task 1.1.4 print misclassified digits as images
-inds = np.intersect1d(np.where(y_test==4),np.where(y_pred==7))
+inds = np.intersect1d(np.where(y_test==3),np.where(y_pred==2))
 print(inds)
 
 for ii,ind in enumerate(inds):
-    plt.subplot(3, 4, ii+1)
+    plt.subplot(1, 2, ii+1)
     plt.imshow(np.reshape(X_test[ind,:],(8,8)), cmap='Greys',interpolation='nearest')
     plt.axis('off')
     
@@ -97,7 +97,7 @@ plt.show()
 #%% Task 1.1.6
 
 Xraw = digits.data
-X_train, X_test, y_train, y_test = train_test_split(Xraw, y, random_state=1, test_size=0.8)
+X_train, X_test, y_train, y_test = train_test_split(Xraw, y, random_state=1, test_size=0.3)
 
 rawdig_svm = svm.SVC(kernel='rbf',C=10)
 rawdig_svm.fit(X_train, y_train)
@@ -149,11 +149,15 @@ plt.show()
 #Evaluating several different values of C, the plot shows that any C greater than or equal to 6 should yield an accuracy of ~0.475.  This is significantly lower than the accuracy of the model on scaled data.
 
 
-#%% Task 1.2.1
+
+
+
+
+#%% Task 1.2.1 ##########################################################
 # set up the model, k-NN classification with k = ?  
 k = 10 # when k = 3, 6, not matching iterative model results?
 X = scale(digits.data)
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.8)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
 knn_model = KNeighborsClassifier(n_neighbors=k)
 knn_model.fit(X_train, y_train)
 
@@ -168,21 +172,31 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 #%% Task 1.2.4 print misclassified digits as images
 
-inds = np.intersect1d(np.where(y_test==1),np.where(y_pred==2))
+inds = np.intersect1d(np.where(y_test==8),np.where(y_pred==1))
 print(inds)
 
 for ii,ind in enumerate(inds):
-    plt.subplot(3, 4, ii+1)
+    plt.subplot(1, 2, ii+1)
     plt.imshow(np.reshape(X_test[ind,:],(8,8)), cmap='Greys',interpolation='nearest')
     plt.axis('off')
     
 plt.show()   
 
+inds = np.intersect1d(np.where(y_test==9),np.where(y_pred==5))
+print(inds)
+
+for ii,ind in enumerate(inds):
+    plt.subplot(1, 2, ii+1)
+    plt.imshow(np.reshape(X_test[ind,:],(8,8)), cmap='Greys',interpolation='nearest')
+    plt.axis('off')
+    
+plt.show()  
+
 #%% Task 1.2.5 
 
 knn_model.get_params()
 
-Ks = np.linspace(1,100,100)
+Ks = np.arange(1,100)
 Accuracies = np.zeros(Ks.shape[0])
 for i,k in enumerate(Ks):
     knn_model = KNeighborsClassifier(n_neighbors=int(k))
@@ -211,12 +225,51 @@ plt.show()
 # when k = 6, Accuracy =  0.922114047288
 
 
+#%%
+k = 6
+#X = scale(digits.data)
+#X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
+knn_model = KNeighborsClassifier(n_neighbors=k)
+knn_model.fit(X_train, y_train)
 
+y_pred = knn_model.predict(X_test)
+print('Confusion Matrix')
+print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
+print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
+#%% Task 1.2.6 raw data
+k = 6
 
+Xraw = digits.data
+X_train, X_test, y_train, y_test = train_test_split(Xraw, y, random_state=1, test_size=0.3)
 
+rawdig_knn = KNeighborsClassifier(n_neighbors=k)
+rawdig_knn.fit(X_train, y_train)
 
+y_pred = rawdig_knn.predict(X_test)
+print('Confusion Matrix')
+print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
+print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
+#%%
+
+rawdig_knn.get_params()
+
+Cs = np.linspace(1,500,100)
+Accuracies = np.zeros(Cs.shape[0])
+for i,C in enumerate(Cs):
+    rawdig_knn = svm.SVC(kernel='rbf', C = C)
+    scores = cross_val_score(estimator = rawdig_knn, X = Xraw, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
+    Accuracies[i]  = scores.mean()
+
+#%%
+    
+plt.plot(Cs,Accuracies)
+plt.title('Evaluating accuracy of C')
+plt.xlabel('C value')
+plt.ylabel('Accuracy')
+plt.xlim(0,10) # change this to 0, 10
+plt.show()
 
 
 
@@ -262,7 +315,7 @@ print('Shares array length: ',len(y))
 
 k = 10
 
-X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.8)
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
 news_knn = KNeighborsClassifier(n_neighbors=k)
 news_knn.fit(X_train, y_train)
 
@@ -311,7 +364,7 @@ plt.show()
 Xsubset = X[:500][:]
 ysubset = y[:500]
 
-X_train, X_test, y_train, y_test = train_test_split(Xsubset, ysubset, random_state=1, test_size=0.8)
+X_train, X_test, y_train, y_test = train_test_split(Xsubset, ysubset, random_state=1, test_size=0.3)
 
 news_svm = svm.SVC(kernel='rbf',C=100)
 news_svm.fit(X_train, y_train)
@@ -357,7 +410,7 @@ def splitData(features):
     news_labels = y # titanic["Survived"].as_matrix()
 
     # Split into training and test sets
-    XTrain, XTest, yTrain, yTest = train_test_split(news_predictors, news_labels, random_state=1, test_size=0.8)
+    XTrain, XTest, yTrain, yTest = train_test_split(news_predictors, news_labels, random_state=1, test_size=0.3)
     return XTrain, XTest, yTrain, yTest
 
 #%%
