@@ -276,6 +276,10 @@ plt.show()
 
 
 
+
+
+
+
 #%% Part 2 ###########################################################
 # Task 2.1
 newsdf = pd.read_csv('OnlineNewsPopularity/OnlineNewsPopularity.csv')
@@ -330,7 +334,7 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 news_knn.get_params()
 
-Ks = np.linspace(1,100,100)
+Ks = np.arange(1,80)
 Accuracies = np.zeros(Ks.shape[0])
 for i,k in enumerate(Ks):
     news_knn = KNeighborsClassifier(n_neighbors=int(k))
@@ -355,14 +359,32 @@ plt.show()
 # choose k = 37
 # when k = 37, Accuracy =  0.564401702664 - still not that great
 
+#%%
+
+k = 37 # based on cross-validation
+
+#X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
+news_knn = KNeighborsClassifier(n_neighbors=k)
+news_knn.fit(X_train, y_train)
+
+y_pred = news_knn.predict(X_test)
+print('Confusion Matrix')
+print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
+print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
+
+
+
 # %% Your interpretation
 
-#At the start, I arbitrarily chose k = 10, which yielded an accuracy of 0.55, which is not too impressive.  I evaluated the accuracy at 100 k-values between 1 and 100, which illustrated that the k-value of 37 yielded the maximum accuracy of 0.564, which is only  marginally better.
+#Maximum accuracy achieved: 0.5803
+#
+#Explanation:
+#At the start, I arbitrarily chose k = 10, which yielded an accuracy of 0.565, which is not too impressive.  I evaluated the accuracy at 100 k-values between 1 and 100, which illustrated that the k-value of 37 yielded the maximum cross-validation accuracy of 0.564.  When I ran the k-NN model using k = 37, the accuracy was 0.5803.
 
 #%% Task 2.4 SVM ################################################
 
-Xsubset = X[:500][:]
-ysubset = y[:500]
+Xsubset = X[:5000][:]
+ysubset = y[:5000]
 
 X_train, X_test, y_train, y_test = train_test_split(Xsubset, ysubset, random_state=1, test_size=0.3)
 
@@ -379,7 +401,7 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 #%%
 news_svm.get_params()
 
-Cs = np.linspace(1,500,100)
+Cs = np.linspace(1,200,10)
 Accuracies = np.zeros(Cs.shape[0])
 for i,C in enumerate(Cs): # what is enumerate?
     print(i,C)
@@ -401,8 +423,35 @@ plt.show()
 
 # why is this?
 
+#%%
+# now run model on entire dataset
+X_train, X_test, y_train, y_test = train_test_split(X, y, random_state=1, test_size=0.3)
+
+news_svm = svm.SVC(kernel='rbf',C=100) # change this
+news_svm.fit(X_train, y_train)
+
+y_pred = news_svm.predict(X_test)
+print('Confusion Matrix')
+print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
+print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
+
+
 #%% Task 2.5 Decision Trees ##################################
 
+decisionTree = tree.DecisionTreeClassifier(max_depth=10, min_samples_split=10)
+decisionTree = decisionTree.fit(XTrain, yTrain)
+
+y_pred_train = decisionTree.predict(XTrain)
+print('Accuracy on training data= ', metrics.accuracy_score(y_true = yTrain, y_pred = y_pred_train))
+
+y_pred = decisionTree.predict(XTest)
+print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
+#renderTree(decisionTree, all_features)
+
+
+
+
+#%%
 #labels =["Popular", "Unpopular"]
 
 def splitData(features):
@@ -418,9 +467,9 @@ def splitData(features):
 all_features = list(newsdf)[2:60]
 XTrain, XTest, yTrain, yTest = splitData(all_features)
 
-min_ss = np.arange(3,50,2)
+min_ss = np.arange(3,450,20)
 #min_ss = [3, 4, 5, 6, 10]
-max_depths = np.arange(3,50,2)
+max_depths = np.arange(3,58,5) # maximum depth = number of features/variables
 #max_depths = [3, 5, 10, 15, 20, 25, 30, 40, 50, 60]
 #Accuracies = np.zeros(min_ss.shape[0])
 #Accuracies = np.zeros(len(min_ss))
@@ -433,7 +482,7 @@ for ss in min_ss:
         y_pred = cross_val_predict(estimator = decisionTree, X = Xsubset, y = ysubset, cv=5) #change Xsubset to X
         accuracy = metrics.accuracy_score(y_true = ysubset, y_pred = y_pred)
         accuracies.append(accuracy)
-        #print('min sample split: '+str(ss)+', max_depth: '+str(depth)+', accuracy: '+str(accuracy))
+        print('min sample split: '+str(ss)+', max_depth: '+str(depth)+', accuracy: '+str(accuracy))
         
 print('max accuracy = '+str(max(accuracies)))
 
@@ -446,13 +495,13 @@ print('max accuracy = '+str(max(accuracies)))
 #plt.show()
 
 
-plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
-##plt.plot(min_ss,Accuracies)
-plt.title('Evaluating accuracy of DT models')
-#plt.xlabel('Min_samples_split value')
-#plt.ylabel('Accuracy')
-##plt.xlim(0,10)
-plt.show()
+#plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
+###plt.plot(min_ss,Accuracies)
+#plt.title('Evaluating accuracy of DT models')
+##plt.xlabel('Min_samples_split value')
+##plt.ylabel('Accuracy')
+###plt.xlim(0,10)
+#plt.show()
 
 #Accuracy on training data=  1.0  # this seems wrong
 #Accuracy on test data=  0.566766514268
@@ -468,3 +517,28 @@ plt.show()
 #min_samples_split=15,max_depth=10
 #Accuracy on training data=  1.0
 #Accuracy on test data=  0.569730411477
+
+#%% run model again w/ optimized parameters
+
+decisionTree = tree.DecisionTreeClassifier(max_depth=8, min_samples_split=403)
+decisionTree = decisionTree.fit(XTrain, yTrain)
+
+y_pred_train = decisionTree.predict(XTrain)
+print('Accuracy on training data= ', metrics.accuracy_score(y_true = yTrain, y_pred = y_pred_train))
+
+y_pred = decisionTree.predict(XTest)
+print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
+#renderTree(decisionTree, all_features)
+
+# YOUR INTERPRETATION
+#1. Which method (k-NN, SVM, Decision Tree) worked best? <br>
+#    k-NN max accuracy = 0.5803 <br>
+#    SVM max accuracy = 0.546 ### CHECK THIS ### <br>
+#    Decision Tree max accuracy = 0.6506 <br>
+#+ How did different parameters influence the accuracy? <br>
+#    k-NN: k strongly influenced cross-validation accuracy ranging from 0.53 to 0.56 <br>
+#    SVM: model accuracy was constant and did not depend on C, which is computationally expensive to determine <br>
+#    Decision Tree:  <br>
+#+ Which model is easiest to interpret?
+#    The k-NN and decision tree models are easiest to intepret primarily because they can be easily visualized.
+#+ How would you interpret your results?
