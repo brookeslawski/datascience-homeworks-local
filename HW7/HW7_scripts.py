@@ -60,12 +60,16 @@ print(metrics.confusion_matrix(y_true = y_test, y_pred = y_pred))
 print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 #%% Task 1.1.4 print misclassified digits as images
-plt.figure(figsize= (10, 10))
-for ii in y_test:
-    if y_pred != y_test:
-        plt.imshow(np.reshape(X[ii,:],(8,8)), cmap='Greys',interpolation='nearest')
+inds = np.intersect1d(np.where(y_test==4),np.where(y_pred==7))
+print(inds)
+
+for ii,ind in enumerate(inds):
+    plt.subplot(3, 4, ii+1)
+    plt.imshow(np.reshape(X_test[ind,:],(8,8)), cmap='Greys',interpolation='nearest')
+    plt.axis('off')
     
-    #  ??????????????????????
+plt.show()       
+
     
 #%% Task 1.1.5 
 dig_svm.get_params()
@@ -83,7 +87,7 @@ plt.plot(Cs,Accuracies)
 plt.title('Evaluating accuracy of C')
 plt.xlabel('C value')
 plt.ylabel('Accuracy')
-plt.xlim(0,500) # change this to 0, 10
+plt.xlim(0,10) # change this to 0, 10
 plt.show()
 
 # choose any C greater than or equal to 6?
@@ -144,7 +148,15 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 #%% Task 1.2.4 print misclassified digits as images
 
-# ???
+inds = np.intersect1d(np.where(y_test==1),np.where(y_pred==2))
+print(inds)
+
+for ii,ind in enumerate(inds):
+    plt.subplot(3, 4, ii+1)
+    plt.imshow(np.reshape(X_test[ind,:],(8,8)), cmap='Greys',interpolation='nearest')
+    plt.axis('off')
+    
+plt.show()   
 
 #%% Task 1.2.5 
 
@@ -152,7 +164,7 @@ knn_model.get_params()
 
 Ks = np.linspace(1,100,100)
 Accuracies = np.zeros(Ks.shape[0])
-for i,k in enumerate(Ks): # what is enumerate?
+for i,k in enumerate(Ks):
     knn_model = KNeighborsClassifier(n_neighbors=int(k))
     scores = cross_val_score(estimator = knn_model, X = X, y = y, cv=5, scoring='accuracy')     # cv = 5 ??
     Accuracies[i]  = scores.mean()
@@ -172,6 +184,7 @@ plt.title('Evaluating accuracy of k-values')
 plt.xlabel('k value')
 plt.ylabel('Accuracy')
 plt.xlim(0,10)
+plt.ylim(0.92,0.95)
 plt.show()
 
 # choose k = 6
@@ -342,26 +355,42 @@ XTrain, XTest, yTrain, yTest = splitData(all_features)
 #
 #y_pred = decisionTree.predict(XTest)
 #print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
-min_ss = np.linspace(1,5,5)
-max_depths = np.linspace(1,5,5)
-Accuracies = np.zeros(min_ss.shape[0])
-for i,ss in enumerate(min_ss): # i don't think i can use enumerate here ?????????????
-    for depth in max_depths:
-        print(i,ss,depth)
-        decisionTree = tree.DecisionTreeClassifier(min_samples_split=ss,max_depth=depth)
-        decisionTree = tree.DecisionTreeClassifier()
-        decisionTree = decisionTree.fit(XTrain, yTrain)
-        y_pred_train = decisionTree.predict(XTrain)
-        y_pred = decisionTree.predict(XTest)
-        Accuracies[i]  = metrics.accuracy_score(y_true = yTest, y_pred = y_pred)
 
-plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
-#plt.plot(min_ss,Accuracies)
-plt.title('Evaluating accuracy of DT models')
-plt.xlabel('Min_samples_split value')
-plt.ylabel('Accuracy')
-#plt.xlim(0,10)
+min_ss = np.arange(3,100)
+#min_ss = [3, 4, 5, 6, 10]
+max_depths = np.arange(3,100)
+#max_depths = [3, 5, 10, 15, 20, 25, 30, 40, 50, 60]
+#Accuracies = np.zeros(min_ss.shape[0])
+#Accuracies = np.zeros(len(min_ss))
+#for i,ss in enumerate(min_ss): 
+accuracies = []
+for ss in min_ss: 
+    for depth in max_depths:
+        #print(i,ss,depth)
+        decisionTree = tree.DecisionTreeClassifier(min_samples_split=ss,max_depth=depth)
+        y_pred = cross_val_predict(estimator = decisionTree, X = Xsubset, y = ysubset, cv=5) #change Xsubset to X
+        accuracy = metrics.accuracy_score(y_true = ysubset, y_pred = y_pred)
+        accuracies.append(accuracy)
+        #print('min sample split: '+str(ss)+', max_depth: '+str(depth)+', accuracy: '+str(accuracy))
+        
+print('max accuracy = '+str(max(accuracies)))
+
+plt.plot(min_ss,accuracies)
+plt.title('Min Sample Splits')
 plt.show()
+
+plt.plot(max_depths,accuracies)
+plt.title('Max Depths')
+plt.show()
+
+
+#plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
+##plt.plot(min_ss,Accuracies)
+#plt.title('Evaluating accuracy of DT models')
+#plt.xlabel('Min_samples_split value')
+#plt.ylabel('Accuracy')
+##plt.xlim(0,10)
+#plt.show()
 
 #Accuracy on training data=  1.0  # this seems wrong
 #Accuracy on test data=  0.566766514268
