@@ -442,16 +442,14 @@ print('Accuracy = ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 
 #%% Task 2.5 Decision Trees ##################################
-
 decisionTree = tree.DecisionTreeClassifier(max_depth=10, min_samples_split=10)
-decisionTree = decisionTree.fit(XTrain, yTrain)
+decisionTree = decisionTree.fit(X_train, y_train)
 
-y_pred_train = decisionTree.predict(XTrain)
-print('Accuracy on training data= ', metrics.accuracy_score(y_true = yTrain, y_pred = y_pred_train))
+y_pred_train = decisionTree.predict(X_train)
+print('Accuracy on training data= ', metrics.accuracy_score(y_true = y_train, y_pred = y_pred_train))
 
-y_pred = decisionTree.predict(XTest)
-print('Accuracy on test data= ', metrics.accuracy_score(y_true = yTest, y_pred = y_pred))
-#renderTree(decisionTree, all_features)
+y_pred = decisionTree.predict(X_test)
+print('Accuracy on test data= ', metrics.accuracy_score(y_true = y_test, y_pred = y_pred))
 
 
 
@@ -490,23 +488,6 @@ for ss in min_ss:
         print('min sample split: '+str(ss)+', max_depth: '+str(depth)+', accuracy: '+str(accuracy))
         
 print('max accuracy = '+str(max(accuracies)))
-
-#plt.plot(min_ss,accuracies)
-#plt.title('Min Sample Splits')
-#plt.show()
-#
-#plt.plot(max_depths,accuracies)
-#plt.title('Max Depths')
-#plt.show()
-
-
-#plt.scatter(min_ss, max_depths, s=Accuracies, c=Accuracies) # is this the best way to show this???
-###plt.plot(min_ss,Accuracies)
-#plt.title('Evaluating accuracy of DT models')
-##plt.xlabel('Min_samples_split value')
-##plt.ylabel('Accuracy')
-###plt.xlim(0,10)
-#plt.show()
 
 #Accuracy on training data=  1.0  # this seems wrong
 #Accuracy on test data=  0.566766514268
